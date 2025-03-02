@@ -43,18 +43,6 @@
         font-size: 24px;
         z-index: 1000;
       }
-      /* URL Bar */
-      #url-bar {
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 60%;
-        padding: 10px;
-        font-size: 18px;
-        border-radius: 5px;
-        border: none;
-      }
     </style>
   </head>
   <body>
@@ -72,21 +60,19 @@
     <a-scene embedded vr-mode-ui="enabled: true" loaded="sceneLoaded()">
       <a-sky color="#000"></a-sky>
       
+      <!-- Camera and Controllers -->
       <a-entity id="camera" camera look-controls wasd-controls position="0 1.6 0">
-        <a-entity
-          laser-controls="hand: right"
-          raycaster="objects: .clickable"
-          cursor="fuse: false; rayOrigin: mouse;">
-        </a-entity>
       </a-entity>
+      <a-entity id="right-hand" hand-controls="hand: right"></a-entity>
+      <a-entity id="left-hand" hand-controls="hand: left"></a-entity>
       
-      <!-- URL Bar -->
-      <input id="url-bar" type="text" value="https://www.google.com" onkeydown="if(event.key==='Enter') loadPage()">
+      <!-- Laser Pointer for Interaction -->
+      <a-entity id="controller" laser-controls="hand: right" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;"></a-entity>
       
       <!-- Web Browser Screen -->
-      <a-entity id="browser-container" position="0 1.6 -3">
-        <iframe id="browser" class="clickable" src="https://www.google.com" width="1280" height="720" style="border: none; width: 3.2m; height: 1.8m;"></iframe>
-      </a-entity>
+      <a-plane id="browser-container" position="0 1.6 -3" width="3.2" height="1.8" material="shader: html; target: #browser-frame"></a-plane>
+      
+      <iframe id="browser-frame" class="clickable" src="https://www.google.com" width="1280" height="720" style="display: none;"></iframe>
     </a-scene>
     
     <script>
@@ -96,11 +82,6 @@
       
       function sceneLoaded() {
         document.getElementById('loading-screen').style.display = 'none';
-      }
-
-      function loadPage() {
-        const url = document.getElementById('url-bar').value;
-        document.getElementById('browser').src = url;
       }
 
       window.onload = function() {
