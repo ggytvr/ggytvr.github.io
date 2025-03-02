@@ -68,19 +68,21 @@
       <a-sky color="#000"></a-sky>
       
       <!-- Ambient Lighting from Screen -->
-      <a-light type="point" position="0 1.6 -3" intensity="1" distance="5" color="#ffffff"></a-light>
+      <a-light type="point" position="0 1.6 -3" intensity="1.5" distance="5" color="#ffffff"></a-light>
       
       <!-- Camera -->
       <a-entity id="camera" camera look-controls wasd-controls position="0 1.6 0"></a-entity>
       
-      <!-- Both Controllers -->
-      <a-entity id="right-controller" laser-controls="hand: right" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;"></a-entity>
-      <a-entity id="left-controller" laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
+      <!-- Both Controllers (White with Blue Laser) -->
+      <a-entity id="right-controller" laser-controls="hand: right" raycaster="objects: .clickable; lineColor: blue" material="color: white"></a-entity>
+      <a-entity id="left-controller" laser-controls="hand: left" raycaster="objects: .clickable; lineColor: blue" material="color: white"></a-entity>
       
-      <!-- Web Browser Screen -->
-      <a-entity id="browser-container" geometry="primitive: plane; width: 3.2; height: 1.8" material="shader: html; target: #browser-frame" position="0 1.6 -3"></a-entity>
+      <!-- Web Browser Screen (TV-like) -->
+      <a-entity id="browser-container" geometry="primitive: plane; width: 3.2; height: 1.8" material="shader: html; target: #browser-frame" position="0 1.6 -3">
+        <a-box position="0 0 0" depth="0.1" width="3.4" height="2" color="#222"></a-box>
+      </a-entity>
       
-      <iframe id="browser-frame" class="clickable" src="https://example.com" width="1024" height="768"></iframe>
+      <iframe id="browser-frame" class="clickable" src="https://duckduckgo.com" width="1024" height="768"></iframe>
     </a-scene>
     
     <script>
