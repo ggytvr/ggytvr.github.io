@@ -43,6 +43,13 @@
         font-size: 24px;
         z-index: 1000;
       }
+      /* Hidden iframe */
+      #browser-frame {
+        position: absolute;
+        width: 1024px;
+        height: 768px;
+        left: -9999px;
+      }
     </style>
   </head>
   <body>
@@ -60,16 +67,17 @@
     <a-scene embedded vr-mode-ui="enabled: true" loaded="sceneLoaded()">
       <a-sky color="#000"></a-sky>
       
-      <!-- Camera and Controller -->
+      <!-- Camera -->
       <a-entity id="camera" camera look-controls wasd-controls position="0 1.6 0"></a-entity>
       
-      <!-- Laser Pointer for Interaction (No Hands) -->
-      <a-entity id="controller" laser-controls="hand: right" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;"></a-entity>
+      <!-- Both Controllers -->
+      <a-entity id="right-controller" laser-controls="hand: right" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;"></a-entity>
+      <a-entity id="left-controller" laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
       
       <!-- Web Browser Screen -->
-      <a-plane id="browser-container" position="0 1.6 -3" width="3.2" height="1.8" material="shader: html; target: #browser-frame" color="#fff"></a-plane>
+      <a-entity id="browser-container" geometry="primitive: plane; width: 3.2; height: 1.8" material="shader: html; target: #browser-frame" position="0 1.6 -3"></a-entity>
       
-      <iframe id="browser-frame" class="clickable" src="https://www.google.com" width="1280" height="720" style="position: absolute; left: -9999px;"></iframe>
+      <iframe id="browser-frame" class="clickable" src="https://www.google.com"></iframe>
     </a-scene>
     
     <script>
