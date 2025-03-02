@@ -60,19 +60,16 @@
     <a-scene embedded vr-mode-ui="enabled: true" loaded="sceneLoaded()">
       <a-sky color="#000"></a-sky>
       
-      <!-- Camera and Controllers -->
-      <a-entity id="camera" camera look-controls wasd-controls position="0 1.6 0">
-      </a-entity>
-      <a-entity id="right-hand" hand-controls="hand: right"></a-entity>
-      <a-entity id="left-hand" hand-controls="hand: left"></a-entity>
+      <!-- Camera and Controller -->
+      <a-entity id="camera" camera look-controls wasd-controls position="0 1.6 0"></a-entity>
       
-      <!-- Laser Pointer for Interaction -->
+      <!-- Laser Pointer for Interaction (No Hands) -->
       <a-entity id="controller" laser-controls="hand: right" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;"></a-entity>
       
       <!-- Web Browser Screen -->
-      <a-plane id="browser-container" position="0 1.6 -3" width="3.2" height="1.8" material="shader: html; target: #browser-frame"></a-plane>
+      <a-plane id="browser-container" position="0 1.6 -3" width="3.2" height="1.8" material="shader: html; target: #browser-frame" color="#fff"></a-plane>
       
-      <iframe id="browser-frame" class="clickable" src="https://www.google.com" width="1280" height="720" style="display: none;"></iframe>
+      <iframe id="browser-frame" class="clickable" src="https://www.google.com" width="1280" height="720" style="position: absolute; left: -9999px;"></iframe>
     </a-scene>
     
     <script>
@@ -83,7 +80,7 @@
       function sceneLoaded() {
         document.getElementById('loading-screen').style.display = 'none';
       }
-
+      
       window.onload = function() {
         setTimeout(sceneLoaded, 2000);
       }
