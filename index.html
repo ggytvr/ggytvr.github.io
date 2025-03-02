@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>VR Web Viewer</title>
+    <title>VR Web Browser</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-    <script src="https://www.youtube.com/iframe_api"></script>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -28,8 +27,7 @@
       button:hover {
         background-color: #cc0000;
       }
-      
-      /* Loading Screen Styles */
+      /* Loading Screen */
       #loading-screen {
         position: fixed;
         top: 0;
@@ -45,17 +43,29 @@
         font-size: 24px;
         z-index: 1000;
       }
+      /* URL Bar */
+      #url-bar {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        padding: 10px;
+        font-size: 18px;
+        border-radius: 5px;
+        border: none;
+      }
     </style>
   </head>
   <body>
     <!-- Loading Screen -->
     <div id="loading-screen">
-      <p>Loading VR Web Viewer...</p>
+      <p>Loading VR Web Browser...</p>
     </div>
 
     <div class="container">
-      <h1>VR Web Viewer</h1>
-      <p>Watch YouTube or browse Google in VR</p>
+      <h1>VR Web Browser</h1>
+      <p>Browse the web in VR</p>
       <button onclick="enterVR()">Enter VR Mode</button>
     </div>
     
@@ -70,29 +80,16 @@
         </a-entity>
       </a-entity>
       
-      <a-entity id="youtube-container" position="-1 1.6 -3">
-        <iframe id="youtube" class="clickable" width="1280" height="720" style="border: none; width: 3.2m; height: 1.8m;" allowfullscreen>
-        </iframe>
-      </a-entity>
+      <!-- URL Bar -->
+      <input id="url-bar" type="text" value="https://www.google.com" onkeydown="if(event.key==='Enter') loadPage()">
       
-      <a-entity id="google-container" position="1 1.6 -3">
-        <iframe id="google" class="clickable" src="https://www.google.com" width="1280" height="720" style="border: none; width: 3.2m; height: 1.8m;"></iframe>
+      <!-- Web Browser Screen -->
+      <a-entity id="browser-container" position="0 1.6 -3">
+        <iframe id="browser" class="clickable" src="https://www.google.com" width="1280" height="720" style="border: none; width: 3.2m; height: 1.8m;"></iframe>
       </a-entity>
     </a-scene>
     
     <script>
-      let player;
-      function onYouTubeIframeAPIReady() {
-        player = new YT.Player('youtube', {
-          height: '720',
-          width: '1280',
-          videoId: 'dQw4w9WgXcQ',
-          events: {
-            'onReady': (event) => event.target.playVideo()
-          }
-        });
-      }
-      
       function enterVR() {
         document.querySelector('a-scene').enterVR();
       }
@@ -101,8 +98,13 @@
         document.getElementById('loading-screen').style.display = 'none';
       }
 
+      function loadPage() {
+        const url = document.getElementById('url-bar').value;
+        document.getElementById('browser').src = url;
+      }
+
       window.onload = function() {
-        setTimeout(sceneLoaded, 2000); // Simulate loading time
+        setTimeout(sceneLoaded, 2000);
       }
     </script>
   </body>
