@@ -7,16 +7,13 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
     <script>
-        AFRAME.registerComponent('loading-screen', {
-            init: function () {
-                let scene = this.el;
-                let loadingScreen = document.getElementById('loading-screen');
+        function startVR() {
+            document.getElementById("menu").style.display = "none"; // Hide menu
+            document.getElementById("vr-scene").style.display = "block"; // Show VR scene
 
-                scene.addEventListener('loaded', () => {
-                    loadingScreen.style.display = 'none';
-                });
-            }
-        });
+            let scene = document.querySelector("a-scene");
+            scene.enterVR(); // Start VR mode
+        }
 
         AFRAME.registerComponent('tv-click', {
             init: function () {
@@ -29,18 +26,27 @@
         });
     </script>
     <style>
-        body { margin: 0; overflow: hidden; }
-        #loading-screen {
+        body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+        #menu {
             position: fixed;
             width: 100%;
             height: 100%;
             background: black;
             color: white;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            z-index: 999;
+            text-align: center;
+        }
+        #start-button {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
         }
         #tv-container {
             width: 560px;
@@ -59,10 +65,15 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">Loading...</div>
+    <!-- Non-VR Menu -->
+    <div id="menu">
+        <h1>Welcome to VR TV</h1>
+        <p>Press start to enter VR</p>
+        <button id="start-button" onclick="startVR()">Start</button>
+    </div>
 
-    <a-scene loading-screen="true" embedded xr-mode-ui="enabled">
+    <!-- VR Scene (Hidden until Start is Pressed) -->
+    <a-scene id="vr-scene" style="display: none;">
         <!-- Room Walls -->
         <a-box position="0 0 0" width="10" height="5" depth="10" color="#222"></a-box>
 
@@ -80,9 +91,6 @@
         <!-- VR Controllers with Blue Laser -->
         <a-entity laser-controls="hand: right" raycaster="objects: #tv" line="color: blue"></a-entity>
         <a-entity laser-controls="hand: left" raycaster="objects: #tv" line="color: blue"></a-entity>
-
-        <!-- Spatial Audio -->
-        <a-sound src="https://www.myinstants.com/media/sounds/tv-static.mp3" position="0 2 -4" autoplay loop="true"></a-sound>
     </a-scene>
 </body>
 </html>
