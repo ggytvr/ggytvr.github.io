@@ -1,102 +1,89 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>VR Web Browser</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Web App with TV</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        text-align: center;
-        background-color: #181818;
-        color: white;
-      }
-      .container {
-        margin-top: 50px;
-      }
-      button {
-        background-color: #ff0000;
-        color: white;
-        border: none;
-        padding: 15px 30px;
-        font-size: 18px;
-        cursor: pointer;
-        margin: 10px;
-        border-radius: 5px;
-      }
-      button:hover {
-        background-color: #cc0000;
-      }
-      /* Loading Screen */
-      #loading-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: black;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        color: white;
-        font-size: 24px;
-        z-index: 1000;
-      }
-      /* Hidden iframe */
-      #browser-frame {
-        position: absolute;
-        width: 1024px;
-        height: 768px;
-        left: -9999px;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-      <p>Loading VR Web Browser...</p>
-    </div>
-
-    <div class="container">
-      <h1>VR Web Browser</h1>
-      <p>Browse the web in VR</p>
-      <button onclick="enterVR()">Enter VR Mode</button>
-    </div>
-    
-    <a-scene embedded vr-mode-ui="enabled: true" loaded="sceneLoaded()">
-      <a-sky color="#000"></a-sky>
-      
-      <!-- Ambient Lighting from Screen -->
-      <a-light type="point" position="0 1.6 -3" intensity="1.5" distance="5" color="#ffffff"></a-light>
-      
-      <!-- Camera -->
-      <a-entity id="camera" camera look-controls wasd-controls position="0 1.6 0"></a-entity>
-      
-      <!-- Both Controllers (White with Blue Laser) -->
-      <a-entity id="right-controller" laser-controls="hand: right" raycaster="objects: .clickable; lineColor: blue" material="color: white"></a-entity>
-      <a-entity id="left-controller" laser-controls="hand: left" raycaster="objects: .clickable; lineColor: blue" material="color: white"></a-entity>
-      
-      <!-- Web Browser Screen (TV-like) -->
-      <a-entity id="browser-container" geometry="primitive: plane; width: 3.2; height: 1.8" material="shader: html; target: #browser-frame" position="0 1.6 -3">
-        <a-box position="0 0 0" depth="0.1" width="3.4" height="2" color="#222"></a-box>
-      </a-entity>
-      
-      <iframe id="browser-frame" class="clickable" src="https://duckduckgo.com" width="1024" height="768"></iframe>
-    </a-scene>
-    
+    <script src="https://cdn.jsdelivr.net/npm/aframe-webxr@1.0.0/webxr.js"></script>
     <script>
-      function enterVR() {
-        document.querySelector('a-scene').enterVR();
-      }
-      
-      function sceneLoaded() {
-        document.getElementById('loading-screen').style.display = 'none';
-      }
-      
-      window.onload = function() {
-        setTimeout(sceneLoaded, 2000);
-      }
+        AFRAME.registerComponent('loading-screen', {
+            init: function () {
+                let scene = this.el;
+                let loadingScreen = document.getElementById('loading-screen');
+
+                scene.addEventListener('loaded', () => {
+                    loadingScreen.style.display = 'none';
+                });
+            }
+        });
+
+        AFRAME.registerComponent('tv-click', {
+            init: function () {
+                let tv = this.el;
+                tv.addEventListener('click', () => {
+                    let iframe = document.getElementById('tv-screen');
+                    iframe.src += "&autoplay=1";  // Start playing when clicked
+                });
+            }
+        });
     </script>
-  </body>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        #loading-screen {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            z-index: 999;
+        }
+        #tv-container {
+            width: 560px;
+            height: 315px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: black;
+        }
+        #tv-screen {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">Loading...</div>
+
+    <a-scene loading-screen="true" embedded xr-mode-ui="enabled">
+        <!-- Room Walls -->
+        <a-box position="0 0 0" width="10" height="5" depth="10" color="#222"></a-box>
+
+        <!-- TV Screen -->
+        <a-entity id="tv" tv-click position="0 2 -4" geometry="primitive: plane; width: 2.5; height: 1.5"
+                  material="shader: html; target: #tv-container"></a-entity>
+
+        <!-- YouTube Video (Hidden in HTML) -->
+        <div id="tv-container">
+            <iframe id="tv-screen" src="https://www.youtube.com/embed/AFWKHaOkh20?si=D2gx_q5DcP3Di5kS"
+                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+        </div>
+
+        <!-- VR Controllers with Blue Laser -->
+        <a-entity laser-controls="hand: right" raycaster="objects: #tv" line="color: blue"></a-entity>
+        <a-entity laser-controls="hand: left" raycaster="objects: #tv" line="color: blue"></a-entity>
+
+        <!-- Spatial Audio -->
+        <a-sound src="https://www.myinstants.com/media/sounds/tv-static.mp3" position="0 2 -4" autoplay loop="true"></a-sound>
+    </a-scene>
+</body>
 </html>
