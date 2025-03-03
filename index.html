@@ -3,27 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VR Web App with TV</title>
+    <title>VR Video Player</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
     <script>
+        let videoElement;
+
+        function handleVideoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                videoElement = document.createElement("video");
+                videoElement.src = url;
+                videoElement.setAttribute("id", "video-player");
+                videoElement.setAttribute("crossorigin", "anonymous");
+                videoElement.loop = false;
+                videoElement.style.display = "none";
+                document.body.appendChild(videoElement);
+                document.getElementById("start-button").disabled = false; // Enable start button
+            }
+        }
+
         function startVR() {
             document.getElementById("menu").style.display = "none"; // Hide menu
             document.getElementById("vr-scene").style.display = "block"; // Show VR scene
 
             let scene = document.querySelector("a-scene");
             scene.enterVR(); // Start VR mode
+
+            // Assign video to A-Frame
+            let videoTexture = document.getElementById("video-screen");
+            videoTexture.setAttribute("material", "src", "#video-player");
+
+            // Play the video when entering VR
+            videoElement.play();
         }
 
-        AFRAME.registerComponent('tv-click', {
-            init: function () {
-                let tv = this.el;
-                tv.addEventListener('click', () => {
-                    let iframe = document.getElementById('tv-screen');
-                    iframe.src += "&autoplay=1";  // Start playing when clicked
-                });
+        function playPauseVideo() {
+            if (videoElement.paused) {
+                videoElement.play();
+            } else {
+                videoElement.pause();
             }
-        });
+        }
+
+        function skip(seconds) {
+            videoElement.currentTime += seconds;
+        }
     </script>
     <style>
         body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
@@ -48,28 +74,18 @@
             cursor: pointer;
             margin-top: 20px;
         }
-        #tv-container {
-            width: 560px;
-            height: 315px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: black;
-        }
-        #tv-screen {
-            width: 100%;
-            height: 100%;
-            border: none;
+        #start-button:disabled {
+            background: gray;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
     <!-- Non-VR Menu -->
     <div id="menu">
-        <h1>Welcome to VR TV</h1>
-        <p>Press start to enter VR</p>
-        <button id="start-button" onclick="startVR()">Start</button>
+        <h1>Upload a Video</h1>
+        <input type="file" id="video-upload" accept="video/*" onchange="handleVideoUpload(event)">
+        <button id="start-button" onclick="startVR()" disabled>Start VR</button>
     </div>
 
     <!-- VR Scene (Hidden until Start is Pressed) -->
@@ -78,19 +94,23 @@
         <a-box position="0 0 0" width="10" height="5" depth="10" color="#222"></a-box>
 
         <!-- TV Screen -->
-        <a-entity id="tv" tv-click position="0 2 -4" geometry="primitive: plane; width: 2.5; height: 1.5"
-                  material="shader: html; target: #tv-container"></a-entity>
-
-        <!-- YouTube Video (Hidden in HTML) -->
-        <div id="tv-container">
-            <iframe id="tv-screen" src="https://www.youtube.com/embed/AFWKHaOkh20?si=D2gx_q5DcP3Di5kS"
-                    allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen></iframe>
-        </div>
+        <a-entity id="video-screen" position="0 2 -4" geometry="primitive: plane; width: 2.5; height: 1.5"
+                  material="shader: flat; side: double"></a-entity>
 
         <!-- VR Controllers with Blue Laser -->
-        <a-entity laser-controls="hand: right" raycaster="objects: #tv" line="color: blue"></a-entity>
-        <a-entity laser-controls="hand: left" raycaster="objects: #tv" line="color: blue"></a-entity>
+        <a-entity laser-controls="hand: right" raycaster="objects: .video-control" line="color: blue"></a-entity>
+        <a-entity laser-controls="hand: left" raycaster="objects: .video-control" line="color: blue"></a-entity>
+
+        <!-- Video Controls in VR -->
+        <a-entity class="video-control" position="-1 1 -3" geometry="primitive: plane; width: 0.5; height: 0.3"
+                  material="color: green" text="value: Play/Pause; align: center;" onclick="playPauseVideo()"></a-entity>
+        <a-entity class="video-control" position="0 1 -3" geometry="primitive: plane; width: 0.5; height: 0.3"
+                  material="color: red" text="value: -5s; align: center;" onclick="skip(-5)"></a-entity>
+        <a-entity class="video-control" position="1 1 -3" geometry="primitive: plane; width: 0.5; height: 0.3"
+                  material="color: blue" text="value: +5s; align: center;" onclick="skip(5)"></a-entity>
+
+        <!-- Spatial Audio with Reverb -->
+        <a-entity sound="src: #video-player; autoplay: false; positional: true; refDistance: 1; rolloffFactor: 2; maxDistance: 10"></a-entity>
     </a-scene>
 </body>
 </html>
